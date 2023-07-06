@@ -23,6 +23,8 @@ KinoTape::KinoTape(QImage* imgIn, QFileInfo& fileInfo, int num)
 bool KinoTape::FindLeftBorder(int startX, int startY)
 {
     const int DELTA_Y = 10;
+    const int countStep = 280;
+
     int y = startY;
     int countYconst = 0;
     int oldX = -1;
@@ -30,103 +32,166 @@ bool KinoTape::FindLeftBorder(int startX, int startY)
     int startGoodY = 0;
     int avgGoodX = 0;
     int sumX = 0;
+    int x;
 
+    int endX;
+    QPoint *pt;
 
     while(y < img->height())
     {
-        isBegin = true;
+        pt = new QPoint(-1, y);
 
-        for(int x = startX; x < img->width() - 300; x++)
+        if(MainWindow::IsWhitePixel(img, x, y))
         {
-            if(!MainWindow::IsWhitePixel(img, x, y)             // если не белые пиксели по длине от 0 до 30
-                && !MainWindow::IsWhitePixel(img, x + 10, y)
-                && !MainWindow::IsWhitePixel(img, x + 15, y)
-                && !MainWindow::IsWhitePixel(img, x + 20, y)
-                && !MainWindow::IsWhitePixel(img, x + 25, y)
-                && !MainWindow::IsWhitePixel(img, x + 30, y))
+            // белый пиксель, будем двигаться вправо
+            endX =  (startX + countStep) < (img->width() - 300) ? startX + countStep : img->width() - 300;
+            for(int x = startX; x < endX; x++)
             {
-                if(isBegin)
-                {
-                    // был первым черный пиксель, перемещение назад
-                    x -= 5;
-                    if(x < 0)
-                        break;
 
-                    if(x < startX)
+                if(!MainWindow::IsWhitePixel(img, x, y))
+                {
+                    // не белый пиксель найден
+
+                    if(!MainWindow::IsWhitePixel(img, x + 10, y)
+                        && !MainWindow::IsWhitePixel(img, x + 15, y)
+                        && !MainWindow::IsWhitePixel(img, x + 20, y)
+                        && !MainWindow::IsWhitePixel(img, x + 25, y)
+                        && !MainWindow::IsWhitePixel(img, x + 30, y))
                     {
-                        startX = x;
-                        continue;
+                        // првее, тоже не белые. Подходит
+                        pt->setX(x);
+                        break;
                     }
-
-                    continue;
                 }
+            }
+        }
 
-
-                if( abs(x - oldX) < 10 || oldX == -1)        // если разница с предыдущей точкой не более 5 пикселов
+        else
+        {
+            // не белый пиксель, будем двигаться влево
+            endX = (startX - countStep) > 0 ? startX - countStep : 0;
+            for(int x = startX; x > endX; x--)
+            {
+                if(MainWindow::IsWhitePixel(img, x, y))
                 {
-//                    if(countYconst == 0 && oldX != -1)      // если до этой точки были пропуски
+                    // белый пиксель найден
+
+                    if(!MainWindow::IsWhitePixel(img, x - 10, y) && !MainWindow::IsWhitePixel(img, x - 15, y))
+                    {
+                        // левее, тоже белые. Подходит
+                        --x;
+                        pt->setX(x);
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        leftBorder.push_back(pt);
+        startX = x;
+        y += DELTA_Y;
+
+    }
+
+
+
+
+//    while(y < img->height())
+//    {
+//        isBegin = true;
+
+//        for(int x = startX; x < img->width() - 300; x++)
+//        {
+//            if(!MainWindow::IsWhitePixel(img, x, y)             // если не белые пиксели по длине от 0 до 30
+//                && !MainWindow::IsWhitePixel(img, x + 10, y)
+//                && !MainWindow::IsWhitePixel(img, x + 15, y)
+//                && !MainWindow::IsWhitePixel(img, x + 20, y)
+//                && !MainWindow::IsWhitePixel(img, x + 25, y)
+//                && !MainWindow::IsWhitePixel(img, x + 30, y))
+//            {
+//                if(isBegin)
+//                {
+//                    // был первым черный пиксель, перемещение назад
+//                    x -= 5;
+//                    if(x < 0)
+//                        break;
+
+//                    if(x < startX)
 //                    {
-//                        int current = leftBorder.count();                       // текущий индекс
-//                        float dX = (float)(x - oldX) / (float)(current - oldIndex) /** (float)DELTA_Y*/;       // приращение Х
-//                        float x1 = (float)oldX + dX;                                            // первая точк аХ
-//                        for(int index = oldIndex + 1; index < current; index++, x1 += dX) // коррекция координат Х
-//                        {
-//                            leftBorder[index]->setX(x1);
-//                        }
+//                        startX = x;
+//                        continue;
 //                    }
 
-                    if(countYconst == 0 && avgGoodX == 0)
-                        startGoodY = y;
-
-                    ++countYconst;
-                    sumX += x;
-
-                    if(countYconst >= 100)
-                    {
-                        avgGoodX = sumX / countYconst;
-                    }
+//                    continue;
+//                }
 
 
-                    oldX = x;
-                    //oldIndex = leftBorder.count();
+//                if( abs(x - oldX) < 10 || oldX == -1)        // если разница с предыдущей точкой не более 5 пикселов
+//                {
+////                    if(countYconst == 0 && oldX != -1)      // если до этой точки были пропуски
+////                    {
+////                        int current = leftBorder.count();                       // текущий индекс
+////                        float dX = (float)(x - oldX) / (float)(current - oldIndex) /** (float)DELTA_Y*/;       // приращение Х
+////                        float x1 = (float)oldX + dX;                                            // первая точк аХ
+////                        for(int index = oldIndex + 1; index < current; index++, x1 += dX) // коррекция координат Х
+////                        {
+////                            leftBorder[index]->setX(x1);
+////                        }
+////                    }
 
-                    if(x < startX)
-                        startX = x;
+//                    if(countYconst == 0 && avgGoodX == 0)
+//                        startGoodY = y;
 
-//                    startX = x >= 20 ? x - 20 : 0;
-                    //QPoint *pt = new QPoint( x, y);
-                    leftBorder.push_back(new QPoint( x, y));
-                }
-                else                                        // разница большая, делаем пропуск
-                {
-                    oldX = x;
+//                    ++countYconst;
+//                    sumX += x;
 
-                    if(avgGoodX == 0)
-                    {
-                        startGoodY = -1;
-                        countYconst = 0;
-                        avgGoodX = 0;
-                        sumX = 0;
-                    }
+//                    if(countYconst >= 100)
+//                    {
+//                        avgGoodX = sumX / countYconst;
+//                    }
 
-                    leftBorder.push_back(new QPoint( x, y));
-//                    pt->setX(-1);
-                }
 
-                break;
-            }
-            isBegin = false;
-        }
-        y += DELTA_Y;
-    }
+//                    oldX = x;
+//                    //oldIndex = leftBorder.count();
 
-    if(countYconst > 0)
-    {
-        CorrectLeftEdge(startGoodY, avgGoodX, countYconst);
-        return true;
-    }
+//                    if(x < startX)
+//                        startX = x;
 
-    return false;
+////                    startX = x >= 20 ? x - 20 : 0;
+//                    //QPoint *pt = new QPoint( x, y);
+//                    leftBorder.push_back(new QPoint( x, y));
+//                }
+//                else                                        // разница большая, делаем пропуск
+//                {
+//                    oldX = x;
+
+//                    if(avgGoodX == 0)
+//                    {
+//                        startGoodY = -1;
+//                        countYconst = 0;
+//                        avgGoodX = 0;
+//                        sumX = 0;
+//                    }
+
+//                    leftBorder.push_back(new QPoint( x, y));
+////                    pt->setX(-1);
+//                }
+
+//                break;
+//            }
+//            isBegin = false;
+//        }
+//        y += DELTA_Y;
+//    }
+
+//    if(countYconst > 0)
+//    {
+//        CorrectLeftEdge(startGoodY, avgGoodX, countYconst);
+//        return true;
+//    }
+
+    return true;
 }
 
 
