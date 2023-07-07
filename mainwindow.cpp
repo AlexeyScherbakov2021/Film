@@ -30,52 +30,36 @@ void MainWindow::on_pushButton_clicked()
     const int CADRS = 36;
     int startX;
     int y = 60;
-    //QList<KinoTape*> listTape;
-    QString startPath = "d:\\Work\\QT\\Кинокамера\\0003";
-//    KinoTape *Tape[4];
-//    QList<QPoint*> listPrevBorder;;
+    QString startPath = "d:\\Work\\QT\\Кинокамера\\0005";
 
     QDir dir(startPath);
     QFileInfoList listFiles = dir.entryInfoList(QStringList() << "*.jpg", QDir::Files);
 
     foreach (QFileInfo item, listFiles)
     {
-//        img = new QImage(listFiles[255].absoluteFilePath());
+//        img = new QImage(listFiles[187].absoluteFilePath());
         img = new QImage(item.absoluteFilePath());
         LeftMargin = IsWhiteLine(img, 2, 42, y, y + 100);
         startX = LeftMargin > 0 ? LeftMargin + 2 : 0;
         if(LeftMargin < 0)
             startX = 0;
 
-//        Tape[0] = nullptr;
-//        Tape[1] = nullptr;
-//        Tape[2] = nullptr;
-//        Tape[3] = nullptr;
-        //listPrevBorder = nullptr;
 
         int numberTape = 1;
         for(int x = startX; x < 4300 - 800 && numberTape <= 4; x += 780, numberTape++)
         {
-//            Tape[numberTape] = new KinoTape(img, item, numberTape + 1);
 
             KinoTape *Tape = new KinoTape(img, item, numberTape);
-//            KinoTape *Tape = new KinoTape(img, listFiles[48], numberTape + 1);
             if(Tape->FindLeftBorder(x, y))
             {
                 Tape->InitAllKadrs();
                 Tape->FinalTuneKadrs();
-                //listTape.push_back(Tape);
-//                listPrevBorder = Tape->GetLeftBorder();
                 x = Tape->GetRightX();
             }
             //delete Tape;
         }
 
         delete img;
-//        delete Tape[0];
-//        delete Tape[1];
-//        delete Tape[2];
-//        delete Tape[3];
     }
 
 }
@@ -87,7 +71,7 @@ void MainWindow::on_pushButton_clicked()
 bool MainWindow::IsWhitePixel(QImage *img, int x, int y)
 {
     QColor rgb = img->pixel(x, y);
-    return (rgb.red() > 0xc0 && rgb.green() > 0xc0 && rgb.blue() > 0xc0);
+    return (rgb.red() > 0xe0 && rgb.green() > 0xe0 && rgb.blue() > 0xe0);
 }
 
 
@@ -126,46 +110,3 @@ int MainWindow::IsWhiteLine(QImage *img, int x0, int x1, int y0, int y1)
 
 }
 
-
-
-
-//bool GetTypeLine(QImage &img, int startX, int startY)
-//{
-
-//    for(int y = startY; y < img.height() - 90; y += 10)
-//    {
-//        for(int i = startX; i < startX + 94; i++)
-//        {
-//            QColor rgb = img.pixel(i, y);
-
-//            if(rgb.red() > 0xdd && rgb.green() > 0xdd && rgb.blue() > 0xdd)
-//            {
-//                rgb = img.pixel(i + 4, y);
-//                if(rgb.red() > 0xdd && rgb.green() > 0xdd && rgb.blue() > 0xdd)
-//                    goto mFind;
-//            }
-//        }
-
-//    }
-
-//    return false;
-
-
-//    mFind:
-
-//    return true;
-
-//}
-
-
-//void SetVerticalLenta(QList<LeftEdge*> listEdge)
-//{
-//    for(int i = 1; i < listEdge.size() - 1; i++)
-//    {
-//        if(listEdge[i]->pt.x() - listEdge[i-1]->pt.x() > 10
-//            && listEdge[i+1]->pt.x() - listEdge[i]->pt.x() > 10)
-//            listEdge[i].pt.setX((listEdge[i-1]->pt.x() + listEdge[i+1]->pt.x())/2);
-
-
-//    }
-//}

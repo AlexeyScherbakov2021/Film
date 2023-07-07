@@ -30,22 +30,31 @@ bool KinoTape::FindLeftBorder(int startX, int startY)
     int oldX = -1;
     int startGoodY = 0;
     bool isEndCount = false;
+    int LeftEdgeX = startX;
+    int widthX;
 
     int endX;
     QPoint *pt;
 
+    startX = -1;
     while(y < img->height() - 50)
     {
         pt = new QPoint(-1, y);
         currX = -1;
 
+        widthX = countStep;
         if(startX < 0)
-            startX = 0;
+        {
+            startX = LeftEdgeX;
+            widthX = img->width();
+
+        }
 
         if(MainWindow::IsWhitePixel(img, startX, y))
         {
             // белый пиксель, будем двигаться вправо
-            endX =  (startX + countStep) < (img->width() - 300) && y > startY ? startX + countStep : img->width() - 300;
+
+            endX =  (startX + widthX) < (img->width() - 300) && y > startY ? startX + widthX : img->width() - 300;
             ++startX;
             for(int x = startX; x < endX; x++)
             {
@@ -118,7 +127,10 @@ bool KinoTape::FindLeftBorder(int startX, int startY)
             isEndCount = true;
 
 
-        oldX = currX;;
+        if(currX >= 0)
+        {
+            oldX = currX;
+        }
         startX = currX;
         y += DELTA_Y;
 
