@@ -28,8 +28,9 @@ private:
 
     bool GetFirstPerf();
     Kadr* FindRectPerf(int midX, int midY/*, int leftX*/);
-    void CorrectLeftEdge(int startGoodY, int avgGoodX, int countYconst);
+    void CorrectLeftEdge(int startGoodY, /*int avgGoodX,*/ int countYconst);
     bool TestBlackLeftMargin(int y);
+    double CalcDeltaX(int fromY, int toY);
 //    bool FindNextPerf(int& midX, int& midY);
 
 public:

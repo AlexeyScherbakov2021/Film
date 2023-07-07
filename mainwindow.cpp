@@ -31,7 +31,7 @@ void MainWindow::on_pushButton_clicked()
     int startX;
     int y = 60;
     //QList<KinoTape*> listTape;
-    QString startPath = "d:\\Work\\QT\\Кинокамера\\0001";
+    QString startPath = "d:\\Work\\QT\\Кинокамера\\0003";
 //    KinoTape *Tape[4];
 //    QList<QPoint*> listPrevBorder;;
 
@@ -40,10 +40,10 @@ void MainWindow::on_pushButton_clicked()
 
     foreach (QFileInfo item, listFiles)
     {
-//        img = new QImage(listFiles[207].absoluteFilePath());
+//        img = new QImage(listFiles[255].absoluteFilePath());
         img = new QImage(item.absoluteFilePath());
         LeftMargin = IsWhiteLine(img, 2, 42, y, y + 100);
-        startX = LeftMargin;
+        startX = LeftMargin > 0 ? LeftMargin + 2 : 0;
         if(LeftMargin < 0)
             startX = 0;
 
@@ -59,7 +59,7 @@ void MainWindow::on_pushButton_clicked()
 //            Tape[numberTape] = new KinoTape(img, item, numberTape + 1);
 
             KinoTape *Tape = new KinoTape(img, item, numberTape);
-//            KinoTape *Tape = new KinoTape(img, listFiles[207], numberTape + 1);
+//            KinoTape *Tape = new KinoTape(img, listFiles[48], numberTape + 1);
             if(Tape->FindLeftBorder(x, y))
             {
                 Tape->InitAllKadrs();
@@ -87,7 +87,7 @@ void MainWindow::on_pushButton_clicked()
 bool MainWindow::IsWhitePixel(QImage *img, int x, int y)
 {
     QColor rgb = img->pixel(x, y);
-    return (rgb.red() > 0xdd && rgb.green() > 0xdd && rgb.blue() > 0xdd);
+    return (rgb.red() > 0xc0 && rgb.green() > 0xc0 && rgb.blue() > 0xc0);
 }
 
 
@@ -110,7 +110,7 @@ int MainWindow::IsWhiteLine(QImage *img, int x0, int x1, int y0, int y1)
     for(int x = x0; x < x1; x++)
     {
         rgb = img->pixel(x, y);
-        if(rgb.red() > 0xdd && rgb.green() > 0xdd && rgb.blue() > 0xdd)
+        if(rgb.red() > 0xc0 && rgb.green() > 0xc0 && rgb.blue() > 0xc0)
         {
             if(startWhite < 0)
                 startWhite = x;
