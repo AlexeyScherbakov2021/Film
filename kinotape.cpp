@@ -32,6 +32,7 @@ bool KinoTape::FindLeftBorder(int startX, int startY)
     bool isEndCount = false;
     int LeftEdgeX = startX;
     int widthX;
+    bool isFirst = true;
 
     int endX;
     QPoint *pt;
@@ -50,8 +51,9 @@ bool KinoTape::FindLeftBorder(int startX, int startY)
 
         }
 
-        if(MainWindow::IsWhitePixel(img, startX, y))
+        if(MainWindow::IsWhitePixel(img, startX, y) || (isFirst && startX > 0 ))
         {
+
             // белый пиксель, будем двигаться вправо
 
             endX =  (startX + widthX) < (img->width() - 300) && y > startY ? startX + widthX : img->width() - 300;
@@ -61,6 +63,9 @@ bool KinoTape::FindLeftBorder(int startX, int startY)
 
                 if(!MainWindow::IsWhitePixel(img, x, y))
                 {
+                    if(isFirst && x - startX < 20)
+                        continue;
+
                     // не белый пиксель найден
 
                     if(!MainWindow::IsWhitePixel(img, x + 10, y)
@@ -75,6 +80,7 @@ bool KinoTape::FindLeftBorder(int startX, int startY)
                         break;
                     }
                 }
+
             }
         }
 
@@ -99,9 +105,11 @@ bool KinoTape::FindLeftBorder(int startX, int startY)
                     }
                 }
             }
-
+            if(startX < 0)
+                pt->setX(0);
         }
 
+        isFirst = false;
         leftBorder.push_back(pt);
 
 
@@ -136,7 +144,7 @@ bool KinoTape::FindLeftBorder(int startX, int startY)
 
     }
 
-    if(countYconst > 0)
+    if(countYconst >= 100)
     {
         CorrectLeftEdge(startGoodY, /*avgGoodX,*/ countYconst);
         return true;
@@ -149,12 +157,12 @@ bool KinoTape::FindLeftBorder(int startX, int startY)
 //------------------------------------------------------------------------------------------------
 // проверка на левый черный отступ
 //------------------------------------------------------------------------------------------------
-bool KinoTape::TestBlackLeftMargin(int y)
-{
-    return true;
-//    LeftMargin = MainWindow::IsWhiteLine(img, 2, 42, y, y + 100);
+//bool KinoTape::TestBlackLeftMargin(int y)
+//{
+//    return true;
+////    LeftMargin = MainWindow::IsWhiteLine(img, 2, 42, y, y + 100);
 
-}
+//}
 
 
 
@@ -478,7 +486,7 @@ Kadr* KinoTape::FindRectPerf(int midX, int midY)
     }
 
     if( (bottomY - topY) > 100 && (bottomY - topY) < 115
-        && (rightX - leftX) > 70 &&  (rightX - leftX) < 92)
+        && (rightX - leftX) > 67 &&  (rightX - leftX) < 92)
     {
         kadr = new KadrSuper8(this);
         type = TypeTape::Super8;
@@ -653,6 +661,9 @@ void KinoTape::InitAllKadrs()
 {
     // поисе первой перфорации, определение типа пленки
     GetFirstPerf();
+
+    if(listKadr.isEmpty())
+        return;
 
     Kadr* oldKadr = listKadr.back();
     int endY = img->height() - (param->Height - param->CenterPerfY);

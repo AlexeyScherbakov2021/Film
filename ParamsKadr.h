@@ -46,7 +46,7 @@ public:
         Height = 394;
         Width = 765;
         XCenterFromPerf = 322;
-        YCenterFromPerf = 0;
+        YCenterFromPerf = 10;
         HalfKadrX = 568 / 2;
         HalfKadrY = Height / 2;
     }

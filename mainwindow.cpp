@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QApplication>
 #include <QDir>
 #include <QImage>
 #include <QPoint>
@@ -9,8 +10,9 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    isStop = false;
     ui->setupUi(this);
-
+    ui->pushButtonStop->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -27,18 +29,31 @@ struct LeftEdge
 
 void MainWindow::on_pushButton_clicked()
 {
-    const int CADRS = 36;
+//    const int CADRS = 36;
     int startX;
     int y = 60;
-    QString startPath = "d:\\Work\\QT\\Кинокамера\\0005";
+    QString startPath = "d:\\Work\\QT\\Кинокамера\\0004";
+
+    ui->pushButton->setEnabled(false);
+    ui->pushButtonStop->setEnabled(true);
+
 
     QDir dir(startPath);
     QFileInfoList listFiles = dir.entryInfoList(QStringList() << "*.jpg", QDir::Files);
 
+    ui->progressBar->setRange(0, listFiles.count());
+    ui->progressBar->setTextVisible(true);
+
+    int step = 0;
     foreach (QFileInfo item, listFiles)
     {
-//        img = new QImage(listFiles[187].absoluteFilePath());
-        img = new QImage(item.absoluteFilePath());
+
+        ui->progressBar->setValue(++step);
+        if(isStop)
+            break;
+
+        img = new QImage(listFiles[292].absoluteFilePath());
+//        img = new QImage(item.absoluteFilePath());
         LeftMargin = IsWhiteLine(img, 2, 42, y, y + 100);
         startX = LeftMargin > 0 ? LeftMargin + 2 : 0;
         if(LeftMargin < 0)
@@ -56,11 +71,15 @@ void MainWindow::on_pushButton_clicked()
                 Tape->FinalTuneKadrs();
                 x = Tape->GetRightX();
             }
-            //delete Tape;
+            QApplication::processEvents();
         }
 
         delete img;
     }
+
+    isStop = true;
+    ui->pushButton->setEnabled(true);
+    ui->pushButtonStop->setEnabled(false);
 
 }
 
@@ -90,7 +109,7 @@ int MainWindow::IsWhiteLine(QImage *img, int x0, int x1, int y0, int y1)
         return -1;
 
     int y = y0;
-    int countWhite = 0;
+//    int countWhite = 0;
     for(int x = x0; x < x1; x++)
     {
         rgb = img->pixel(x, y);
@@ -98,15 +117,24 @@ int MainWindow::IsWhiteLine(QImage *img, int x0, int x1, int y0, int y1)
         {
             if(startWhite < 0)
                 startWhite = x;
-            ++countWhite;
+//            ++countWhite;
         }
         y =  (double)y + dY;
     }
 
     // находим процент белых пикселей
-    int res = countWhite * 100 / countX;
+//    int res = countWhite * 100 / countX;
 
     return startWhite;
+
+}
+
+
+void MainWindow::on_pushButtonStop_clicked()
+{
+    isStop = true;
+    ui->pushButton->setEnabled(true);
+    ui->pushButtonStop->setEnabled(false);
 
 }
 

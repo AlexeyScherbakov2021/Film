@@ -24,8 +24,11 @@ public:
 private slots:
     void on_pushButton_clicked();
 
+    void on_pushButtonStop_clicked();
+
 private:
     int LeftMargin;
+    bool isStop;
 
     QImage *img;
     Ui::MainWindow *ui;
