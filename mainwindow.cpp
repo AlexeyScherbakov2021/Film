@@ -20,7 +20,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
 struct LeftEdge
 {
     QPoint pt;
@@ -29,14 +28,12 @@ struct LeftEdge
 
 void MainWindow::on_pushButton_clicked()
 {
-//    const int CADRS = 36;
     int startX;
     int y = 60;
     QString startPath = "d:\\Work\\QT\\Кинокамера\\0004";
 
     ui->pushButton->setEnabled(false);
     ui->pushButtonStop->setEnabled(true);
-
 
     QDir dir(startPath);
     QFileInfoList listFiles = dir.entryInfoList(QStringList() << "*.jpg", QDir::Files);
@@ -47,13 +44,12 @@ void MainWindow::on_pushButton_clicked()
     int step = 0;
     foreach (QFileInfo item, listFiles)
     {
-
         ui->progressBar->setValue(++step);
         if(isStop)
             break;
 
-        img = new QImage(listFiles[292].absoluteFilePath());
-//        img = new QImage(item.absoluteFilePath());
+//        img = new QImage(listFiles[292].absoluteFilePath());
+        img = new QImage(item.absoluteFilePath());
         LeftMargin = IsWhiteLine(img, 2, 42, y, y + 100);
         startX = LeftMargin > 0 ? LeftMargin + 2 : 0;
         if(LeftMargin < 0)

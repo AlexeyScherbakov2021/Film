@@ -31,6 +31,9 @@ private:
     void CorrectLeftEdge(int startGoodY, /*int avgGoodX,*/ int countYconst);
 //    bool TestBlackLeftMargin(int y);
     double CalcDeltaX(int fromY, int toY);
+    bool GetBlackPixelLine(int x0, int y0, int x1, int y1, QPoint *pt);
+    bool RectPerf(int& midX, int& midY, QRect *rc = nullptr);
+    int SetStabilValue(QList<int>& list);
 //    bool FindNextPerf(int& midX, int& midY);
 
 public:
