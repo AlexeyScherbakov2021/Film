@@ -400,66 +400,69 @@ bool KinoTape::GetFirstPerf()
 //------------------------------------------------------------------------------------------------
 Kadr* KinoTape::FindRectPerf(int midX, int midY)
 {
-//    int leftX = -1;
-//    int rightX = -1;
-//    int topY = -1;
-//    int bottomY = -1;
-//    int resX = midX;
-//    int resY = midY;
+    int leftX = -1;
+    int rightX = -1;
+    int topY = -1;
+    int bottomY = -1;
+    int resX = midX;
+    int resY = midY;
 
     Kadr* kadr = nullptr;
 
-//    int leftEdge = GetLeftXFromY(midY);
+    int leftEdge = GetLeftXFromY(midY);
 //    int step = 3;
 
 //    while(step > 0)
 //    {
 //        --step;
-//        // выявление левой границы
-//        for(int x = resX; x > leftEdge; x--)
-//        {
-//            if(!MainWindow::IsWhitePixel(img, x, resY))
-//            {
-//                leftX = x;
-//                break;
-//            }
-//        }
+        // выявление левой границы
+        for(int x = resX; x > leftEdge; x--)
+        {
+            if(!MainWindow::IsWhitePixel(img, x, resY))
+            {
+                leftX = x;
+                break;
+            }
+        }
 
-//        // выявление правой границы
-//        for(int x = resX; x < leftEdge + 270; x++)
-//        {
-//            if(!MainWindow::IsWhitePixel(img, x, resY))
-//            {
-//                rightX = x;
-//                break;
-//            }
-//        }
+        // выявление правой границы
+        for(int x = resX; x < leftEdge + 270; x++)
+        {
+            if(!MainWindow::IsWhitePixel(img, x, resY))
+            {
+                rightX = x;
+                break;
+            }
+        }
 
-//        // средння точка
-//        resX = leftX + (rightX - leftX) / 2;
+        // средння точка
+        resX = leftX + (rightX - leftX) / 2;
 
-//        // выявление верхней границы
-//        for(int y = midY; y > resY - 122; y--)
-//        {
-//            if(!MainWindow::IsWhitePixel(img, resX, y))
-//            {
-//                topY = y;
-//                break;
-//            }
-//        }
+        // выявление верхней границы
+        for(int y = midY; y > resY - 122; y--)
+        {
+            if(!MainWindow::IsWhitePixel(img, resX, y))
+            {
+                topY = y;
+                break;
+            }
+        }
 
-//        // выявление нижней границы
-//        for(int y = resY; y < topY + 150; y++)
-//        {
-//            if(!MainWindow::IsWhitePixel(img, resX, y))
-//            {
-//                bottomY = y;
-//                break;
-//            }
-//        }
+        // выявление нижней границы
+        for(int y = resY; y < topY + 150; y++)
+        {
+            if(!MainWindow::IsWhitePixel(img, resX, y))
+            {
+                bottomY = y;
+                break;
+            }
+        }
 
-//        resY = topY + (bottomY - topY)/2;
+        resY = topY + (bottomY - topY)/2;
 //    }
+
+        midX = resX;
+        midY = resY;
 
     QRect rc;
     RectPerf(midX, midY, &rc);
@@ -491,7 +494,7 @@ Kadr* KinoTape::FindRectPerf(int midX, int midY)
 
 
 //------------------------------------------------------------------------------------------------
-// нахождение небелой точки по нправлении линии
+// нахождение темной точки по нправлении линии
 //------------------------------------------------------------------------------------------------
 bool KinoTape::GetBlackPixelLine(int x0, int y0, int x1, int y1, QPoint *pt)
 {
@@ -535,7 +538,7 @@ bool KinoTape::GetBlackPixelLine(int x0, int y0, int x1, int y1, QPoint *pt)
             break;
     }
 
-    // проверить часть линии до конца на черный цвет
+    // проверить часть линии до конца на темный цвет
 
 //    while( x1 - x >= 6 || y1 - y >= 6)
 //    {
@@ -563,18 +566,24 @@ int KinoTape::SetStabilValue(QList<int>& list)
 {
     int summa = 0;
     int avg;
+    int minVal = 2000000;
+    int maxVal = -1;
+    int mid;
 
     foreach (int n, list)
     {
         summa += n;
+        if(n > maxVal) maxVal = n;
+        if(n < minVal) minVal = n;
     }
 
     avg = summa / list.count();
+    mid = (maxVal - minVal) / 2;
 
     summa = 0;
     for(int i = 0; i < list.count(); ++i)
     {
-        if(list[i] > avg)
+        if(abs(list[i] - avg) > mid)
         {
             list.removeAt(i);
             --i;
@@ -633,10 +642,35 @@ bool KinoTape::RectPerf(int& midX, int& midY, QRect *rc)
     int topY = pt.y();
     midY = (bottomY + topY) / 2;
 
-    int x0 = leftX + 25;
-    int x1 = rightX - 25;
+    int y0 = topY + 25;
+    int y1 = bottomY - 25;
     QList<int> listTopX;
     QList<int> listBottomX;
+
+    for (int i = y0; i < y1; i += 5)
+    {
+        if(GetBlackPixelLine( midX, i, leftX - 20, i, &pt))
+            listTopX.push_back(pt.x());
+
+        if(GetBlackPixelLine( midX, i, rightX + widthPerf + 20, i, &pt))
+            listBottomX.push_back(pt.x());
+    }
+
+    if(listBottomX.count() == 0)
+        widthPerf = 0;
+    rightX = SetStabilValue(listBottomX);
+
+    if(listTopX.count() == 0)
+        widthPerf = 0;
+    leftX = SetStabilValue(listTopX);
+    midX = (leftX + rightX) / 2;
+
+
+    int x0 = leftX + 25;
+    int x1 = rightX - 25;
+    listTopX.clear();
+    listBottomX.clear();
+
 
     for (int i = x0; i < x1; i += 5)
     {
@@ -647,22 +681,26 @@ bool KinoTape::RectPerf(int& midX, int& midY, QRect *rc)
             listBottomX.push_back(pt.y());
     }
 
+    if(listBottomX.count() == 0)
+        widthPerf = 0;
     bottomY = SetStabilValue(listBottomX);
+    if(listTopX.count() == 0)
+        widthPerf = 0;
     topY = SetStabilValue(listTopX);
     midY = (topY + bottomY) / 2;
 
-    // находми правую границу
-    if(!GetBlackPixelLine(midX, midY, midX + widthPerf , midY, &pt))
-        return false;
+//    // находми правую границу
+//    if(!GetBlackPixelLine(midX, midY, midX + widthPerf , midY, &pt))
+//        return false;
 
-    rightX = pt.x();
+//    rightX = pt.x();
 
-    // находми левую границу
-    if(!GetBlackPixelLine(midX, midY, midX - widthPerf, midY, &pt))
-        return false;
+//    // находми левую границу
+//    if(!GetBlackPixelLine(midX, midY, midX - widthPerf, midY, &pt))
+//        return false;
 
-    leftX = pt.x();
-    midX = (rightX + leftX) / 2;
+//    leftX = pt.x();
+//    midX = (rightX + leftX) / 2;
 
     if(rc != nullptr)
     {
