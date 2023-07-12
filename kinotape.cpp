@@ -606,7 +606,7 @@ bool KinoTape::RectPerf(int& midX, int& midY, QRect *rc)
 
     if(type == TypeTape::Unknown)
     {
-        widthPerf = 168;
+        widthPerf = 164;
         heightPerf = 122;
     }
     else
@@ -623,7 +623,7 @@ bool KinoTape::RectPerf(int& midX, int& midY, QRect *rc)
     int rightX = pt.x();
 
     // находми левую границу
-    if(!GetBlackPixelLine(rightX - 20, midY, rightX - widthPerf - 20, midY, &pt))
+    if(!GetBlackPixelLine(midX, midY, midX - widthPerf, midY, &pt))
         return false;
 
     int leftX = pt.x();
@@ -656,12 +656,10 @@ bool KinoTape::RectPerf(int& midX, int& midY, QRect *rc)
             listBottomX.push_back(pt.x());
     }
 
-    if(listBottomX.count() == 0)
-        widthPerf = 0;
-    rightX = SetStabilValue(listBottomX);
+    if(listBottomX.empty() || listTopX.empty())
+        return false;
 
-    if(listTopX.count() == 0)
-        widthPerf = 0;
+    rightX = SetStabilValue(listBottomX);
     leftX = SetStabilValue(listTopX);
     midX = (leftX + rightX) / 2;
 
@@ -681,11 +679,10 @@ bool KinoTape::RectPerf(int& midX, int& midY, QRect *rc)
             listBottomX.push_back(pt.y());
     }
 
-    if(listBottomX.count() == 0)
-        widthPerf = 0;
+    if(listBottomX.empty() || listTopX.empty())
+        return false;
+
     bottomY = SetStabilValue(listBottomX);
-    if(listTopX.count() == 0)
-        widthPerf = 0;
     topY = SetStabilValue(listTopX);
     midY = (topY + bottomY) / 2;
 
@@ -800,6 +797,7 @@ void KinoTape::InitAllKadrs()
     int x = oldKadr->ptPerf.x();
     for(int y = oldKadr->ptPerf.y() + param->Height; y < endY; y += param->Height)
     {
+        kadr = nullptr;
         if(RectPerf(x, y))
         {
             if(type == TypeTape::Super8)
