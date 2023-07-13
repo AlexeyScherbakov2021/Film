@@ -279,7 +279,7 @@ void KinoTape::CorrectLeftEdge(int startGoodY, int countYconst)
             // поиск следующего плохого участка
             for(; lastInd < leftBorder.count() - 1; lastInd++)
             {
-                if( leftBorder[lastInd]->x() - leftBorder[lastInd + 1]->x() > 6)
+                if( abs(leftBorder[lastInd]->x() - leftBorder[lastInd + 1]->x()) > 6)
                 {
                     //lastInd = ind;
                     break;
@@ -381,8 +381,13 @@ bool KinoTape::GetFirstPerf()
                                 listKadr.push_front(kadrPrev);
                         }
 
-                        listKadr.push_back(kadr);
-                        return true;
+
+                        if(type != TypeTape::Standard || kadr->ptPerf.y() > 360)
+                        {
+                            listKadr.push_back(kadr);
+                            return true;
+                        }
+
                     }
                 }
 
@@ -662,6 +667,9 @@ bool KinoTape::RectPerf(int& midX, int& midY, QRect *rc)
     leftX = SetStabilValue(listTopX);
     midX = (leftX + rightX) / 2;
 
+    if(type != TypeTape::Unknown && rightX - leftX < widthPerf - 10)
+        return false;
+
 
     int x0 = leftX + 25;
     int x1 = rightX - 25;
@@ -684,6 +692,9 @@ bool KinoTape::RectPerf(int& midX, int& midY, QRect *rc)
     bottomY = SetStabilValue(listBottomX);
     topY = SetStabilValue(listTopX);
     midY = (topY + bottomY) / 2;
+
+    if(type != TypeTape::Unknown && bottomY - topY < heightPerf - 10)
+        return false;
 
     if(rc != nullptr)
     {

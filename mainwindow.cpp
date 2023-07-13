@@ -48,7 +48,7 @@ void MainWindow::on_pushButton_clicked()
         if(isStop)
             break;
 
-//        img = new QImage(listFiles[307].absoluteFilePath());
+//        img = new QImage(listFiles[11].absoluteFilePath());
         img = new QImage(item.absoluteFilePath());
         LeftMargin = IsWhiteLine(img, 2, 42, y, y + 100);
         startX = LeftMargin > 0 ? LeftMargin + 2 : 0;
