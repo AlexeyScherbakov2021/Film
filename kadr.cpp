@@ -16,7 +16,7 @@ void Kadr::SaveKadr(QImage *img, int numKadr, QString& fileName, QString& dir)
         );
 
     QImage img1 = img->copy(rect);
-    QString outPath = QString(dir + "\\%1_%2.jpg").arg(fileName.left(4)).arg(numKadr, 4, 10, QChar('0'));
+    QString outPath = QString(dir + "/%1_%2_%3.jpg").arg(dir.right(1)).arg(fileName.left(4)).arg(numKadr, 4, 10, QChar('0'));
 
 //    if(abs(Angle) > 0.001)
 //    {
@@ -52,11 +52,6 @@ double Kadr::CalcAngle()
 //----------------------------------------------------------------------------------
 void Kadr::SetCenterPoint()
 {
-//    float dAngle = atan((float)tape->param->YCenterFromPerf / (float)tape->param->XCenterFromPerf);
-//    double dAngle = tape->param->YCenterFromPerf == 0
-//        ? 0
-//        : atan((double)tape->param->XCenterFromPerf / (double)tape->param->YCenterFromPerf);
-
 
     double dAngle = atan((double)tape->param->YCenterFromPerf / (double)tape->param->XCenterFromPerf);
     dAngle += Angle;        // общий угол на центр кадра от перфорации
@@ -70,31 +65,3 @@ void Kadr::SetCenterPoint()
     ptCenter.setY(ptPerf.y() + dY);
 }
 
-//----------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------
-//void Kadr8::SaveKadr(QImage *img, int number, QString& fileName, QString& dir)
-//{
-
-//}
-
-//----------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------
-//float Kadr8::CalcAngle()
-//{
-//    int yTop = ptPerf.y() - param8.CenterPerfY;
-//    int yBottom = ptPerf.y() + param8.Height - param8.CenterPerfY;
-
-//    float xTop = tape->GetLeftXFromY(yTop);
-//    float xBottom = tape->GetLeftXFromY(yBottom);
-
-//    float ang = atan((xBottom - xTop) / -(yBottom - yTop));
-
-//    return ang;
-//}
-
-//----------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------
-//void Kadr8::SetCenterPoint()
-//{
-
-//}

@@ -30,7 +30,7 @@ void MainWindow::on_pushButton_clicked()
 {
     int startX;
     int y = 60;
-    QString startPath = "d:\\Work\\QT\\Кинокамера\\0003";
+    QString startPath = "d:\\Work\\QT\\Кинокамера\\0001";
 
     ui->pushButton->setEnabled(false);
     ui->pushButtonStop->setEnabled(true);
