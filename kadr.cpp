@@ -16,13 +16,20 @@ void Kadr::SaveKadr(QImage *img, int numKadr, QString& fileName, QString& dir)
         );
 
     QImage img1 = img->copy(rect);
-//    QTransform trans;
-    //trans.map(QPoint(100,0));
-    //trans.translate(0, 200);
-//    trans.rotate(Angle * 180 / 3.1415 );
-//    QImage img2 = img1.transformed(trans);
     QString outPath = QString(dir + "\\%1_%2.jpg").arg(fileName.left(4)).arg(numKadr, 4, 10, QChar('0'));
-    img1.save(outPath);
+
+//    if(abs(Angle) > 0.001)
+//    {
+//        QTransform trans;
+//        trans.map(QPoint(100,0));
+//        trans.translate(0, 200);
+//        trans.rotate(-Angle * 180 / 3.1415926535 );
+//        QImage img2 = img1.transformed(trans);
+//        img2.save(outPath);
+
+//    }
+//    else
+        img1.save(outPath);
 
 }
 

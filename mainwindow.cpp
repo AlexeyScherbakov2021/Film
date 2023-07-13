@@ -30,7 +30,7 @@ void MainWindow::on_pushButton_clicked()
 {
     int startX;
     int y = 60;
-    QString startPath = "d:\\Work\\QT\\Кинокамера\\0004";
+    QString startPath = "d:\\Work\\QT\\Кинокамера\\0003";
 
     ui->pushButton->setEnabled(false);
     ui->pushButtonStop->setEnabled(true);
@@ -48,7 +48,7 @@ void MainWindow::on_pushButton_clicked()
         if(isStop)
             break;
 
-//        img = new QImage(listFiles[290].absoluteFilePath());
+//        img = new QImage(listFiles[307].absoluteFilePath());
         img = new QImage(item.absoluteFilePath());
         LeftMargin = IsWhiteLine(img, 2, 42, y, y + 100);
         startX = LeftMargin > 0 ? LeftMargin + 2 : 0;
@@ -59,6 +59,8 @@ void MainWindow::on_pushButton_clicked()
         int numberTape = 1;
         for(int x = startX; x < 4300 - 800 && numberTape <= 4; x += 780, numberTape++)
         {
+            if(x >= img->width())
+                break;
 
             KinoTape *Tape = new KinoTape(img, item, numberTape);
             if(Tape->FindLeftBorder(x, y))
@@ -105,7 +107,6 @@ int MainWindow::IsWhiteLine(QImage *img, int x0, int x1, int y0, int y1)
         return -1;
 
     int y = y0;
-//    int countWhite = 0;
     for(int x = x0; x < x1; x++)
     {
         rgb = img->pixel(x, y);
@@ -113,13 +114,9 @@ int MainWindow::IsWhiteLine(QImage *img, int x0, int x1, int y0, int y1)
         {
             if(startWhite < 0)
                 startWhite = x;
-//            ++countWhite;
         }
         y =  (double)y + dY;
     }
-
-    // находим процент белых пикселей
-//    int res = countWhite * 100 / countX;
 
     return startWhite;
 

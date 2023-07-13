@@ -15,7 +15,6 @@ KinoTape::KinoTape(QImage* imgIn, QFileInfo& fileInfo, int num)
     fileName = fileInfo.fileName();
     pathOutput = fileInfo.absolutePath();
     img = imgIn;
-    //img = new QImage(fileInfo.absoluteFilePath());
 }
 
 //------------------------------------------------------------------------------------------------
@@ -410,11 +409,11 @@ Kadr* KinoTape::FindRectPerf(int midX, int midY)
     Kadr* kadr = nullptr;
 
     int leftEdge = GetLeftXFromY(midY);
-//    int step = 3;
+    int step = 3;
 
-//    while(step > 0)
-//    {
-//        --step;
+    while(step > 0)
+    {
+        --step;
         // выявление левой границы
         for(int x = resX; x > leftEdge; x--)
         {
@@ -459,10 +458,10 @@ Kadr* KinoTape::FindRectPerf(int midX, int midY)
         }
 
         resY = topY + (bottomY - topY)/2;
-//    }
+    }
 
-        midX = resX;
-        midY = resY;
+    midX = resX;
+    midY = resY;
 
     QRect rc;
     RectPerf(midX, midY, &rc);
@@ -685,19 +684,6 @@ bool KinoTape::RectPerf(int& midX, int& midY, QRect *rc)
     bottomY = SetStabilValue(listBottomX);
     topY = SetStabilValue(listTopX);
     midY = (topY + bottomY) / 2;
-
-//    // находми правую границу
-//    if(!GetBlackPixelLine(midX, midY, midX + widthPerf , midY, &pt))
-//        return false;
-
-//    rightX = pt.x();
-
-//    // находми левую границу
-//    if(!GetBlackPixelLine(midX, midY, midX - widthPerf, midY, &pt))
-//        return false;
-
-//    leftX = pt.x();
-//    midX = (rightX + leftX) / 2;
 
     if(rc != nullptr)
     {
